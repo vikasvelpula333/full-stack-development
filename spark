@@ -1,0 +1,65 @@
+#!/usr/bin/env php
+<?php
+
+/*
+ * --------------------------------------------------------------------
+ * CodeIgniter command-line tools
+ * --------------------------------------------------------------------
+ * The main entry point into the CLI system and allows you to run
+ * commands and perform maintenance on your application.
+ *
+ * Because CodeIgniter can handle CLI requests as just another web request
+ * this class mainly acts as a passthru to the framework itself.
+ */
+
+define('SPARKED', true);
+
+/*
+ *---------------------------------------------------------------
+ * BOOTSTRAP THE APPLICATION
+ *---------------------------------------------------------------
+ * This process sets up the path constants, loads and registers
+ * our autoloader, along with Composer's, loads our constants
+ * and fires up an environment-specific bootstrapping.
+ */
+
+// Refuse to run when called from a web context.
+if (isset($_SERVER['HTTP_HOST'])) {
+    exit("This script cannot be run from a web request.\n");
+}
+
+// Path to the front controller
+define('FCPATH', __DIR__ . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR);
+
+// Load our paths config file
+require 'app/Config/Paths.php';
+
+$paths = new Config\Paths();
+
+// Location of the framework bootstrap file.
+require $paths->systemDirectory . '/bootstrap.php';
+
+// Load environment variables from .env file, if it exists.
+$app = Config\Services::codeigniter();
+$app->initialize();
+$app->setContext('php-cli');
+
+// Grab our Console
+$console = new CodeIgniter\CLI\Console();
+
+// We want errors to be shown when using it from the CLI.
+ini_set('display_errors', '1');
+error_reporting(E_ALL & ~E_NOTICE);
+
+// Show basic information before we do anything else.
+if (is_int($suppress = array_search('--no-header', $_SERVER['argv'], true))) {
+    unset($_SERVER['argv'][$suppress]);
+    $suppress = true;
+}
+
+$console->showHeader($suppress);
+
+// fire off the command in the main framework.
+$exit = $console->run();
+
+exit($exit);
