@@ -236,7 +236,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - React team for the amazing library
 - Bootstrap team for the UI components
 - Firebase team for JWT implementation
-
----
-
-**Made with ❤️ using CodeIgniter 4 and React.js**
